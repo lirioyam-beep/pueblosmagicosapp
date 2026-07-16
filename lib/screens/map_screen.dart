@@ -4,7 +4,9 @@ import '../data/pueblos_data.dart';
 import '../models/pueblo.dart';
 import '../services/exploracion_controller.dart';
 import '../utils/color_utils.dart';
+import '../utils/progreso_utils.dart';
 import '../widgets/pueblo_node.dart';
+import 'insignias_screen.dart';
 import 'pueblo_detail_screen.dart';
 
 // Paleta general de la app — ver DESIGN.md
@@ -15,22 +17,27 @@ const Color _colorTextoSecundario = Color(0xFF7A6353);
 const Color _colorDoradoXP = Color(0xFFD9A441);
 const Color _colorVerdeCompletado = Color(0xFF3F6F52);
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
-  // Placeholder: sin backend/estado persistente todavía.
-  int get _xpTotal => 0;
+  @override
+  State<MapScreen> createState() => _MapScreenState();
+}
 
-  void _onTapPueblo(BuildContext context, Pueblo pueblo) {
+class _MapScreenState extends State<MapScreen> {
+  Future<void> _onTapPueblo(BuildContext context, Pueblo pueblo) async {
     if (pueblo.estado == EstadoPueblo.bloqueado) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Completa Izamal primero')),
       );
       return;
     }
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => PuebloDetailScreen(pueblo: pueblo)),
     );
+    // Al volver, el usuario pudo haber completado retos en otra pantalla:
+    // refrescamos para que el XP/progreso no se quede con datos viejos.
+    if (mounted) setState(() {});
   }
 
   @override
@@ -54,7 +61,13 @@ class MapScreen extends StatelessWidget {
             _BarraSuperior(
               completados: completados,
               total: total,
-              xpTotal: _xpTotal,
+              xpTotal: calcularXpTotal(pueblos),
+              onTapXp: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const InsigniasScreen()),
+                );
+                if (mounted) setState(() {});
+              },
             ),
             Expanded(
               child: _CaminoPueblos(
@@ -98,11 +111,13 @@ class _BarraSuperior extends StatelessWidget {
   final int completados;
   final int total;
   final int xpTotal;
+  final VoidCallback onTapXp;
 
   const _BarraSuperior({
     required this.completados,
     required this.total,
     required this.xpTotal,
+    required this.onTapXp,
   });
 
   @override
@@ -140,26 +155,29 @@ class _BarraSuperior extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _colorBordeSuave),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star, color: _colorDoradoXP, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  '$xpTotal',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    color: _colorTextoPrincipal,
+          GestureDetector(
+            onTap: onTapXp,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _colorBordeSuave),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.star, color: _colorDoradoXP, size: 18),
+                  const SizedBox(width: 6),
+                  Text(
+                    '$xpTotal',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: _colorTextoPrincipal,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

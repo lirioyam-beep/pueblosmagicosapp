@@ -207,11 +207,15 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
         width: double.infinity,
         height: 56,
         child: ElevatedButton(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => PuebloMapaScreen(pueblo: widget.pueblo),
-            ),
-          ),
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PuebloMapaScreen(pueblo: widget.pueblo),
+              ),
+            );
+            // Refresca insignias/estado al volver de explorar/retos.
+            if (mounted) setState(() {});
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: _colorPueblo,
             foregroundColor: Colors.white,

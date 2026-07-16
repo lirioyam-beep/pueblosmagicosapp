@@ -8,6 +8,7 @@ import '../models/pueblo.dart';
 import '../services/exploracion_controller.dart';
 import '../services/location_service.dart';
 import '../utils/color_utils.dart';
+import '../utils/insignia_utils.dart';
 import '../widgets/mision_card.dart';
 import 'pueblo_mapa_screen.dart';
 
@@ -83,7 +84,10 @@ class _RetosScreenState extends State<RetosScreen> {
   }
 
   void _completarMision(Mision mision) {
-    setState(() => mision.completada = true);
+    setState(() {
+      mision.completada = true;
+      actualizarInsignias(widget.pueblo);
+    });
   }
 
   void _confirmarUbicacionManual(Mision mision) {
@@ -112,11 +116,14 @@ class _RetosScreenState extends State<RetosScreen> {
           IconButton(
             icon: const Icon(Icons.map_outlined),
             tooltip: 'Ver mapa',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => PuebloMapaScreen(pueblo: widget.pueblo),
-              ),
-            ),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => PuebloMapaScreen(pueblo: widget.pueblo),
+                ),
+              );
+              if (mounted) setState(() {});
+            },
           ),
           Container(
             margin: const EdgeInsets.only(right: 16),

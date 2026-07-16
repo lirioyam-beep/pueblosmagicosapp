@@ -174,11 +174,15 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
           IconButton(
             icon: const Icon(Icons.list_alt_outlined),
             tooltip: 'Ver lista de retos',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => RetosScreen(pueblo: widget.pueblo),
-              ),
-            ),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => RetosScreen(pueblo: widget.pueblo),
+                ),
+              );
+              // Refresca marcadores/XP al volver de la lista de retos.
+              if (mounted) setState(() {});
+            },
           ),
           Container(
             margin: const EdgeInsets.only(right: 16),
