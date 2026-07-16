@@ -11,6 +11,7 @@ import '../services/exploracion_controller.dart';
 import '../services/location_service.dart';
 import '../utils/color_utils.dart';
 import '../utils/mision_utils.dart';
+import 'descubrimiento_screen.dart';
 import 'retos_screen.dart';
 
 // Paleta general de la app — ver DESIGN.md
@@ -29,8 +30,13 @@ const Color _colorAzulUsuario = Color(0xFF2E6FDB);
 /// orientarse durante el recorrido. Ver CONTEXT.md y FEATURES.md.
 class PuebloMapaScreen extends StatefulWidget {
   final Pueblo pueblo;
+  final String? misionResaltadaId;
 
-  const PuebloMapaScreen({super.key, required this.pueblo});
+  const PuebloMapaScreen({
+    super.key,
+    required this.pueblo,
+    this.misionResaltadaId,
+  });
 
   @override
   State<PuebloMapaScreen> createState() => _PuebloMapaScreenState();
@@ -48,6 +54,26 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
 
   latlong.LatLng get _centroPueblo =>
       latlong.LatLng(widget.pueblo.latitud, widget.pueblo.longitud);
+
+  Mision? get _misionResaltada {
+    final id = widget.misionResaltadaId;
+    if (id == null) return null;
+    for (final mision in widget.pueblo.misiones) {
+      if (mision.id == id) return mision;
+    }
+    return null;
+  }
+
+  latlong.LatLng get _centroInicial {
+    final resaltada = _misionResaltada;
+    if (resaltada != null) {
+      return latlong.LatLng(resaltada.latitud, resaltada.longitud);
+    }
+    if (_posicionActual != null) {
+      return latlong.LatLng(_posicionActual!.latitude, _posicionActual!.longitude);
+    }
+    return _centroPueblo;
+  }
 
   // Placeholder: XP ganada en este pueblo durante la sesión (sin backend
   // ni estado global todavía — se calcula sumando las misiones completadas).
@@ -96,6 +122,8 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
     if (_posicionActual != null) {
       distancia = _locationService.distanciaAMision(_posicionActual!, mision);
     }
+    final cerca = distancia != null && distancia <= mision.radioMetros;
+    final puedeDescubrir = mision.descubierta || mision.completada || cerca;
 
     showModalBottomSheet(
       context: context,
@@ -107,6 +135,19 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
         mision: mision,
         colorPueblo: _colorPueblo,
         distanciaMetros: distancia,
+        puedeDescubrir: puedeDescubrir,
+        onDescubrir: () async {
+          Navigator.of(context).pop();
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => DescubrimientoScreen(
+                pueblo: widget.pueblo,
+                mision: mision,
+              ),
+            ),
+          );
+          if (mounted) setState(() {});
+        },
       ),
     );
   }
@@ -116,11 +157,14 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
       for (final mision in widget.pueblo.misiones)
         Marker(
           point: latlong.LatLng(mision.latitud, mision.longitud),
-          width: 44,
-          height: 44,
+          width: widget.misionResaltadaId == mision.id ? 58 : 44,
+          height: widget.misionResaltadaId == mision.id ? 58 : 44,
           child: GestureDetector(
             onTap: () => _mostrarMision(mision),
-            child: _MarcadorMision(mision: mision),
+            child: _MarcadorMision(
+              mision: mision,
+              resaltada: widget.misionResaltadaId == mision.id,
+            ),
           ),
         ),
     ];
@@ -215,10 +259,8 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: _posicionActual != null
-                  ? latlong.LatLng(_posicionActual!.latitude, _posicionActual!.longitude)
-                  : _centroPueblo,
-              initialZoom: 15,
+              initialCenter: _centroInicial,
+              initialZoom: widget.misionResaltadaId == null ? 15 : 17,
             ),
             children: [
               TileLayer(
@@ -271,28 +313,41 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
 
 class _MarcadorMision extends StatelessWidget {
   final Mision mision;
+  final bool resaltada;
 
-  const _MarcadorMision({required this.mision});
+  const _MarcadorMision({required this.mision, this.resaltada = false});
 
   @override
   Widget build(BuildContext context) {
-    final colorFondo = mision.completada ? _colorVerdeCompletado : _colorTerracotaActivo;
-    final icono = mision.completada ? Icons.check : iconoPorTipoMision(mision.tipo);
+    final descubierta = mision.descubierta || mision.completada;
+    final colorFondo = mision.completada
+        ? _colorVerdeCompletado
+        : descubierta
+            ? _colorTerracotaActivo
+            : _colorTextoSecundario;
+    final icono = mision.completada
+        ? Icons.check
+        : descubierta
+            ? iconoPorTipoMision(mision.tipo)
+            : Icons.lock_outline;
 
     return Container(
       decoration: BoxDecoration(
         color: colorFondo,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(
+          color: resaltada ? _colorDoradoXP : Colors.white,
+          width: resaltada ? 4 : 2,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 4,
+            blurRadius: resaltada ? 10 : 4,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Icon(icono, color: Colors.white, size: 20),
+      child: Icon(icono, color: Colors.white, size: resaltada ? 24 : 20),
     );
   }
 }
@@ -301,17 +356,26 @@ class _HojaMision extends StatelessWidget {
   final Mision mision;
   final Color colorPueblo;
   final double? distanciaMetros;
+  final bool puedeDescubrir;
+  final VoidCallback onDescubrir;
 
   const _HojaMision({
     required this.mision,
     required this.colorPueblo,
+    required this.puedeDescubrir,
+    required this.onDescubrir,
     this.distanciaMetros,
   });
 
   @override
   Widget build(BuildContext context) {
     final completada = mision.completada;
-    final colorEstado = completada ? _colorVerdeCompletado : colorPueblo;
+    final descubierta = mision.descubierta || completada;
+    final colorEstado = completada
+        ? _colorVerdeCompletado
+        : descubierta || puedeDescubrir
+            ? colorPueblo
+            : _colorTextoSecundario;
 
     String textoDistancia;
     if (completada) {
@@ -337,7 +401,11 @@ class _HojaMision extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(color: colorEstado, shape: BoxShape.circle),
                 child: Icon(
-                  completada ? Icons.check : iconoPorTipoMision(mision.tipo),
+                  completada
+                      ? Icons.check
+                      : descubierta || puedeDescubrir
+                          ? iconoPorTipoMision(mision.tipo)
+                          : Icons.lock_outline,
                   color: Colors.white,
                   size: 20,
                 ),
@@ -357,7 +425,9 @@ class _HojaMision extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            mision.descripcion,
+            descubierta
+                ? mision.descripcion
+                : 'Contenido bloqueado. Acercate a este punto para desbloquear su historia.',
             style: GoogleFonts.inter(fontSize: 13, color: _colorTextoSecundario),
           ),
           const SizedBox(height: 12),
@@ -387,6 +457,26 @@ class _HojaMision extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: ElevatedButton(
+              onPressed: puedeDescubrir ? onDescubrir : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorPueblo,
+                disabledBackgroundColor: _colorBordeSuave,
+                foregroundColor: Colors.white,
+                disabledForegroundColor: _colorTextoSecundario,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                elevation: 0,
+              ),
+              child: Text(
+                descubierta ? 'Ver descubrimiento' : 'Descubrir al llegar',
+                style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
         ],
       ),

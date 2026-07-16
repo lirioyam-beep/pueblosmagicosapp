@@ -10,6 +10,7 @@ class Mision {
   double radioMetros; // radio de activación (default: 100m)
   TipoMision tipo; // ubicacion, trivia, gastronomica
   int xpRecompensa; // XP que otorga al completarse
+  bool descubierta; // true cuando el usuario llego o abrio el descubrimiento
   bool completada;
   String? preguntaTrivia; // solo para tipo trivia
   String? respuestaTrivia;
@@ -29,6 +30,7 @@ class Mision {
     this.radioMetros = 100,
     required this.tipo,
     required this.xpRecompensa,
+    this.descubierta = false,
     this.completada = false,
     this.preguntaTrivia,
     this.respuestaTrivia,

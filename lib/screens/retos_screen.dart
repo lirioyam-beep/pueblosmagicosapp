@@ -10,6 +10,7 @@ import '../services/location_service.dart';
 import '../utils/color_utils.dart';
 import '../utils/insignia_utils.dart';
 import '../widgets/mision_card.dart';
+import 'descubrimiento_screen.dart';
 import 'pueblo_mapa_screen.dart';
 
 const Color _colorFondoCrema = Color(0xFFFBF3E6);
@@ -85,13 +86,27 @@ class _RetosScreenState extends State<RetosScreen> {
 
   void _completarMision(Mision mision) {
     setState(() {
+      mision.descubierta = true;
       mision.completada = true;
       actualizarInsignias(widget.pueblo);
     });
   }
 
+  Future<void> _descubrirMision(Mision mision) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DescubrimientoScreen(
+          pueblo: widget.pueblo,
+          mision: mision,
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   void _confirmarUbicacionManual(Mision mision) {
     setState(() => _confirmadasManualmente.add(mision.id));
+    _descubrirMision(mision);
   }
 
   @override
@@ -194,6 +209,7 @@ class _RetosScreenState extends State<RetosScreen> {
                   distanciaMetros: _distanciaAMision(mision),
                   onCompletar: () => _completarMision(mision),
                   onConfirmarUbicacion: () => _confirmarUbicacionManual(mision),
+                  onDescubrir: () => _descubrirMision(mision),
                 );
               },
             ),

@@ -134,6 +134,41 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
   int _pestanaSeleccionada = 0;
 
   Color get _colorPueblo => colorDesdeHex(widget.pueblo.colorHex);
+  int get _lugaresDescubiertos => widget.pueblo.misiones
+      .where((mision) => mision.descubierta || mision.completada)
+      .length;
+
+  bool _misionDescubierta(String id) {
+    return widget.pueblo.misiones.any(
+      (mision) => mision.id == id && (mision.descubierta || mision.completada),
+    );
+  }
+
+  bool _pestanaDesbloqueada(int indice) {
+    switch (indice) {
+      case 0:
+        return _lugaresDescubiertos > 0;
+      case 1:
+        return _misionDescubierta('izamal_mision_2');
+      case 2:
+        return _lugaresDescubiertos > 0;
+      case 3:
+        return _misionDescubierta('izamal_mision_3');
+      default:
+        return false;
+    }
+  }
+
+  String _mensajeBloqueado(int indice) {
+    switch (indice) {
+      case 1:
+        return 'Leyendas bloqueadas. Descubre el Cerro Kinich Kakmo para revelar esta parte de Izamal.';
+      case 3:
+        return 'Recomendaciones bloqueadas. Explora el mercado y la zona gastronomica para desbloquearlas.';
+      default:
+        return 'Contenido bloqueado. Explora al menos un punto del pueblo para revelar esta seccion.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,19 +192,11 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
                 children: [
                   _buildBanner(),
                   const SizedBox(height: 20),
+                  _buildResumenDescubrimiento(),
+                  const SizedBox(height: 20),
                   _buildSegmentedControl(),
                   const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      _textosContenido[_pestanaSeleccionada],
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        height: 1.5,
-                        color: _colorTextoSecundario,
-                      ),
-                    ),
-                  ),
+                  _buildContenidoPestana(),
                   const SizedBox(height: 28),
                   _buildSeccionInsignias(),
                   const SizedBox(height: 12),
@@ -256,6 +283,113 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
             ),
           );
         }),
+      ),
+    );
+  }
+
+  Widget _buildResumenDescubrimiento() {
+    final total = widget.pueblo.misiones.length;
+    final progreso = total == 0 ? 0.0 : _lugaresDescubiertos / total;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _colorBordeSuave),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Descubrimientos',
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: _colorTextoPrincipal,
+                  ),
+                ),
+                Text(
+                  '$_lugaresDescubiertos/$total',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: _colorPueblo,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progreso,
+                minHeight: 8,
+                backgroundColor: _colorBordeSuave,
+                valueColor: AlwaysStoppedAnimation(_colorPueblo),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'La informacion cultural se desbloquea conforme visitas puntos reales del pueblo.',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: _colorTextoSecundario,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContenidoPestana() {
+    final desbloqueada = _pestanaDesbloqueada(_pestanaSeleccionada);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: desbloqueada
+            ? Text(
+                _textosContenido[_pestanaSeleccionada],
+                key: ValueKey('contenido-$_pestanaSeleccionada'),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: _colorTextoSecundario,
+                ),
+              )
+            : Container(
+                key: ValueKey('bloqueado-$_pestanaSeleccionada'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: _colorBordeSuave),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(Icons.lock_outline, color: _colorTextoSecundario),
+                    const SizedBox(height: 10),
+                    Text(
+                      _mensajeBloqueado(_pestanaSeleccionada),
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        height: 1.4,
+                        color: _colorTextoSecundario,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }

@@ -11,3 +11,10 @@ IconData iconoPorTipoMision(TipoMision tipo) {
       return Icons.restaurant;
   }
 }
+
+String textoEstadoMision(Mision mision, {required bool cerca}) {
+  if (mision.completada) return 'Completado';
+  if (mision.descubierta) return 'Descubierto';
+  if (cerca) return 'Cerca de ti';
+  return 'Bloqueado';
+}

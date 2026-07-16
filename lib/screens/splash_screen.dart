@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'insignias_screen.dart';
+import '../services/auth_service.dart';
 import 'login_screen.dart';
-import 'map_screen.dart';
+import 'register_screen.dart';
+import 'welcome_screen.dart';
 
 // Colores generales de la app — ver DESIGN.md
 const Color _colorFondoCrema = Color(0xFFFBF3E6);
+const Color _colorSuperficie = Color(0xFFFFFFFF);
+const Color _colorBordeSuave = Color(0xFFEFE2C8);
 const Color _colorTextoPrincipal = Color(0xFF3A2A1E);
 const Color _colorTextoSecundario = Color(0xFF7A6353);
 const Color _colorIzamalPrincipal = Color(0xFFD4A017);
@@ -15,43 +18,41 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (AuthService.instance.usuarioActual != null) {
+      return const WelcomeScreen();
+    }
+
     return Scaffold(
       backgroundColor: _colorFondoCrema,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const InsigniasScreen()),
-                    ),
-                    child: CircleAvatar(
-                      radius: 22,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.person_outline,
-                        color: _colorTextoSecundario,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
               const Spacer(flex: 3),
-              // Ilustración placeholder de Yucatán.
               Container(
-                width: 220,
-                height: 220,
+                width: 132,
+                height: 132,
                 decoration: BoxDecoration(
-                  color: _colorIzamalPrincipal.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(24),
+                  color: _colorSuperficie,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: _colorBordeSuave),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.travel_explore,
+                  color: _colorIzamalPrincipal,
+                  size: 58,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
               Text(
                 'Ruta Mágica',
                 textAlign: TextAlign.center,
@@ -63,21 +64,23 @@ class SplashScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Descubre los Pueblos Mágicos de Yucatán',
+                'Inicia sesión para descubrir historias, retos e insignias '
+                'mientras exploras los Pueblos Mágicos de Yucatán.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  fontSize: 16,
+                  fontSize: 15,
+                  height: 1.45,
                   fontWeight: FontWeight.w400,
                   color: _colorTextoSecundario,
                 ),
               ),
-              const Spacer(flex: 4),
+              const Spacer(flex: 3),
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const MapScreen()),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _colorIzamalPrincipal,
@@ -88,7 +91,7 @@ class SplashScreen extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Explorar pueblos',
+                    'Iniciar sesión',
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -97,16 +100,27 @@ class SplashScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                ),
-                child: Text(
-                  'Iniciar sesión',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: _colorTextoSecundario,
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: _colorSuperficie,
+                    foregroundColor: _colorTextoPrincipal,
+                    side: const BorderSide(color: _colorBordeSuave),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                  ),
+                  child: Text(
+                    'Crear cuenta',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

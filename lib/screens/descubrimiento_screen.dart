@@ -17,13 +17,27 @@ const Color _colorVerdeCompletado = Color(0xFF3F6F52);
 /// lugar (vía la notificación de ExploracionController) o al tocarla
 /// manualmente. Muestra el contenido cultural del sitio y luego invita
 /// al reto — así el usuario primero lee, después actúa.
-class DescubrimientoScreen extends StatelessWidget {
+class DescubrimientoScreen extends StatefulWidget {
   final Pueblo pueblo;
   final Mision mision;
 
   const DescubrimientoScreen({super.key, required this.pueblo, required this.mision});
 
+  @override
+  State<DescubrimientoScreen> createState() => _DescubrimientoScreenState();
+}
+
+class _DescubrimientoScreenState extends State<DescubrimientoScreen> {
   Color get _colorPueblo => colorDesdeHex(pueblo.colorHex);
+
+  Pueblo get pueblo => widget.pueblo;
+  Mision get mision => widget.mision;
+
+  @override
+  void initState() {
+    super.initState();
+    mision.descubierta = true;
+  }
 
   @override
   Widget build(BuildContext context) {

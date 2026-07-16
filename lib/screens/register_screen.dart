@@ -46,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         contrasena: _contrasenaController.text,
       );
       if (!mounted) return;
-      irAlPerfilTrasLogin(context);
+      irABienvenidaTrasLogin(context);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
 import '../widgets/campo_texto_auth.dart';
-import 'insignias_screen.dart';
 import 'register_screen.dart';
+import 'welcome_screen.dart';
 
 /// Tras iniciar sesión con éxito, limpia login/registro de la pila y
-/// lleva directo al perfil — así el usuario ve de inmediato que ya
-/// quedó dentro de su cuenta, sin quedarse varado en la splash.
-void irAlPerfilTrasLogin(BuildContext context) {
+/// lleva a una bienvenida personalizada antes de empezar la exploración.
+void irABienvenidaTrasLogin(BuildContext context) {
   Navigator.of(context).pushAndRemoveUntil(
-    MaterialPageRoute(builder: (_) => const InsigniasScreen()),
-    (route) => route.isFirst,
+    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+    (_) => false,
   );
 }
 
@@ -53,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         contrasena: _contrasenaController.text,
       );
       if (!mounted) return;
-      irAlPerfilTrasLogin(context);
+      irABienvenidaTrasLogin(context);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await AuthService.instance.iniciarSesionConGoogle();
       if (!mounted) return;
-      irAlPerfilTrasLogin(context);
+      irABienvenidaTrasLogin(context);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

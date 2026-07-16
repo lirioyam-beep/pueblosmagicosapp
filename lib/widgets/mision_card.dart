@@ -23,6 +23,7 @@ class MisionCard extends StatelessWidget {
   final bool cerca;
   final double? distanciaMetros;
   final VoidCallback? onConfirmarUbicacion;
+  final VoidCallback? onDescubrir;
 
   const MisionCard({
     super.key,
@@ -32,6 +33,7 @@ class MisionCard extends StatelessWidget {
     this.cerca = true,
     this.distanciaMetros,
     this.onConfirmarUbicacion,
+    this.onDescubrir,
   });
 
   bool get _requiereUbicacion => mision.tipo == TipoMision.ubicacion;
@@ -41,7 +43,14 @@ class MisionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final completada = mision.completada;
-    final colorIcono = completada ? _colorVerdeCompletado : _colorTerracotaActivo;
+    final descubierta = mision.descubierta || completada;
+    final puedeDescubrir = !descubierta && cerca;
+    final colorIcono = completada
+        ? _colorVerdeCompletado
+        : descubierta || cerca
+            ? _colorTerracotaActivo
+            : _colorTextoSecundario;
+    final textoEstado = textoEstadoMision(mision, cerca: cerca);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -63,7 +72,11 @@ class MisionCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(color: colorIcono, shape: BoxShape.circle),
             child: Icon(
-              completada ? Icons.check : iconoPorTipoMision(mision.tipo),
+              completada
+                  ? Icons.check
+                  : descubierta || cerca
+                      ? iconoPorTipoMision(mision.tipo)
+                      : Icons.lock_outline,
               color: Colors.white,
               size: 22,
             ),
@@ -82,8 +95,26 @@ class MisionCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: colorIcono.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    textoEstado,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: colorIcono,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  mision.descripcion,
+                  descubierta
+                      ? mision.descripcion
+                      : 'Contenido bloqueado. Acercate al lugar para revelar su historia y activar el reto.',
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     color: _colorTextoSecundario,
@@ -132,7 +163,26 @@ class MisionCard extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   height: 40,
-                  child: _bloqueadaPorUbicacion
+                  child: puedeDescubrir
+                      ? ElevatedButton(
+                          onPressed: onDescubrir,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorPueblo,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Descubrir lugar',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      : _bloqueadaPorUbicacion
                       ? OutlinedButton(
                           onPressed: onConfirmarUbicacion,
                           style: OutlinedButton.styleFrom(
