@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
 import '../widgets/campo_texto_auth.dart';
+import 'login_screen.dart';
 
 // Paleta general de la app — ver DESIGN.md
 const Color _colorFondoCrema = Color(0xFFFBF3E6);
@@ -45,9 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         contrasena: _contrasenaController.text,
       );
       if (!mounted) return;
-      // Cierra Registro y, de paso, Login — vuelve a quien abrió el flujo.
-      Navigator.of(context).pop();
-      Navigator.of(context).pop();
+      irAlPerfilTrasLogin(context);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

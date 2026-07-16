@@ -6,6 +6,15 @@
 MVP de Izamal funcional de principio a fin, verificado en celular real
 (Android V2430). Login real con Firebase Authentication conectado.
 
+⚠️ **Sin verificar en celular todavía**: el último cambio (navegación
+post-login) pasó `flutter analyze` limpio pero no se instaló en el
+dispositivo por tiempo. Para probarlo: `flutter build apk --debug` (en
+esta máquina tardó ~40 min con Firebase) y luego
+`adb install -r build\app\outputs\flutter-apk\app-debug.apk`. Qué revisar:
+iniciar sesión o registrarte debe llevarte directo a tu perfil (antes solo
+regresaba a la splash), y el ícono de la esquina superior derecha de la
+splash ahora también debe abrir el perfil.
+
 ## Completado ✅
 - Entorno Flutter + Android Studio configurados, repo conectado a GitHub
 - Estructura completa de lib/ (screens, models, data, widgets, services, utils)

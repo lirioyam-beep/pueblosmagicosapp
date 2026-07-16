@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'insignias_screen.dart';
 import 'login_screen.dart';
 import 'map_screen.dart';
 
@@ -25,12 +26,17 @@ class SplashScreen extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.person_outline,
-                      color: _colorTextoSecundario,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const InsigniasScreen()),
+                    ),
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.person_outline,
+                        color: _colorTextoSecundario,
+                      ),
                     ),
                   ),
                 ),
