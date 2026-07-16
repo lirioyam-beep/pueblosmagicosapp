@@ -20,19 +20,105 @@ const List<String> _nombresPestanas = [
   'Recomendaciones',
 ];
 
-const List<String> _textosPlaceholder = [
-  'Aquí irá la historia real de este pueblo: su fundación, épocas '
-      'importantes y cómo llegó a convertirse en Pueblo Mágico. '
-      'Contenido pendiente de redactar.',
-  'Aquí irán las leyendas y relatos tradicionales que se cuentan sobre '
-      'este lugar, transmitidos de generación en generación. '
-      'Contenido pendiente de redactar.',
-  'Aquí se describirán las tradiciones, fiestas, artesanías y '
-      'costumbres vivas que forman parte de la cultura de este pueblo. '
-      'Contenido pendiente de redactar.',
-  'Aquí aparecerán recomendaciones de lugares para comer, hospedarse '
-      'y actividades imperdibles durante la visita. '
-      'Contenido pendiente de redactar.',
+// Contenido real de Izamal — investigado y redactado a partir del
+// documento "Contenido cultural ruta mágica" compartido por el equipo.
+const List<String> _textosContenido = [
+  // Historia
+  'Izamal fue uno de los centros religiosos y políticos más importantes '
+      'de la civilización maya. En su época de mayor esplendor contaba con '
+      'al menos cinco grandes pirámides, razón por la cual los mayas la '
+      'llamaban "Itzmal" — "ciudad de los cinco cerros" o "lugar del rocío '
+      'del cielo". Muchas de esas estructuras fueron demolidas durante la '
+      'conquista española para usar sus piedras en la construcción del '
+      'Convento de San Antonio de Padua, levantado en 1553 por los frailes '
+      'franciscanos.\n\n'
+      'El fraile Diego de Landa, quien estableció aquí el primer convento '
+      'franciscano de la península, se haría después tristemente famoso '
+      'por el Auto de Fe de Maní, donde quemó códices mayas — aunque '
+      'paradójicamente también documentó extensamente la cultura maya en '
+      'su obra "Relación de las Cosas de Yucatán".\n\n'
+      'El característico color amarillo que cubre todas las fachadas del '
+      'pueblo no es una tradición prehispánica, sino colonial: según los '
+      'registros, Izamal fue pintado de amarillo ocre en 1993 para recibir '
+      'la visita del Papa Juan Pablo II. Desde entonces el amarillo se '
+      'convirtió en la identidad visual del pueblo y una de las razones '
+      'por las que fue nombrado Pueblo Mágico en 2002.',
+
+  // Leyendas
+  'Las Dos Hermanas\n'
+      'Fray Diego de Landa trajo desde Guatemala dos imágenes idénticas de '
+      'la Virgen, bautizadas como "Las Dos Hermanas": una quedó en Mérida '
+      'y otra en Izamal. El 16 de abril de 1829 un incendio destruyó el '
+      'altar del convento. Cuenta la leyenda que, mientras las llamas '
+      'consumían el altar, el sacristán —un humilde indígena que solía '
+      'platicar con la Virgen— escuchó su voz decirle: "Sálvame, soy la '
+      'Virgen". Siguiendo una tenue luz, la llevó hasta una oquedad en el '
+      'cerro de Kinich Kakmó, donde ambas encontraron refugio.\n\n'
+      'Desde entonces, cada 8 de diciembre durante la madrugada, un '
+      'agradable olor a flores recorre la calle que une el convento con '
+      'la pirámide: señal de que las dos hermanas se intercambian de '
+      'lugar. Nadie las ha visto, pero todos en Izamal lo sienten. Se dice '
+      'que la oquedad donde se refugió la Virgen está custodiada hasta '
+      'hoy por una enorme serpiente.\n\n'
+      'La Esquina del Venado\n'
+      'Un pordiosero dormía cada noche en el zaguán de la casa de Don '
+      'Rodrigo Jesús de la Plata y Albornoz, hombre conocido por su '
+      'dureza. Una mañana, su criado Gaspar le contó algo asombroso: '
+      'donde dormía el mendigo había amanecido un hermoso venado, '
+      'tranquilo como si fuera su casa. Se decía que el pordiosero había '
+      'sido testigo, una noche de diciembre, del intercambio de las dos '
+      'vírgenes de Izamal — y que, conmovidas por su sufrimiento, se '
+      'llevaron su alma al cielo, quedando su espíritu en el venado.\n\n'
+      'Desde ese día el carácter de Don Rodrigo cambió por completo: '
+      'vendió sus bienes para ayudar al prójimo, y el venado nunca se '
+      'separó de su lado. Al morir una mañana de diciembre, Gaspar lo '
+      'encontró en paz — y a sus pies, el venado también había muerto, '
+      'negándose a separarse de él ni en la muerte.',
+
+  // Cultura
+  'Izamal es el corazón espiritual de Yucatán: aquí se venera a la Virgen '
+      'de Izamal, patrona oficial del estado, cuya imagen —tallada en el '
+      'siglo XVI por el fraile franciscano Juan de Mérida— representa la '
+      'fusión entre la espiritualidad maya y la fe católica que define la '
+      'identidad yucateca hasta hoy. Cada 15 de agosto, miles de '
+      'peregrinos llegan caminando desde distintas partes de Yucatán para '
+      'su fiesta patronal.\n\n'
+      'Antes de la conquista, el Cerro Kinich Kakmó era el centro '
+      'religioso más importante del pueblo: los mayas peregrinaban desde '
+      'lugares lejanos para ofrendar al dios solar y pedir curas para '
+      'enfermedades. Y el mercado municipal sigue siendo hoy el corazón '
+      'social de Izamal, donde conviven hierberos tradicionales, '
+      'artesanos y vendedores de henequén — la fibra que fue la base '
+      'económica de Yucatán y que se conoció como "el oro verde".\n\n'
+      'Platillos típicos:\n'
+      '• Papadzul — tortillas bañadas en salsa de pepita de calabaza, '
+      'rellenas de huevo cocido; uno de los platillos más antiguos de la '
+      'cocina yucateca.\n'
+      '• Pollo en escabeche oriental — pollo deshebrado marinado en '
+      'vinagre, cebolla morada y chile xcatic; infaltable en las '
+      'reuniones familiares.\n'
+      '• Tamales de chipilín — masa de maíz con hojas de chipilín, '
+      'envueltos en hoja de plátano; una variante que casi no se '
+      'encuentra fuera de Izamal.',
+
+  // Recomendaciones
+  'Kinich Restaurante\n'
+      'Uno de los restaurantes más reconocidos de Izamal, especializado '
+      'en cocina yucateca tradicional. Sirven cochinita pibil, pollo en '
+      'escabeche, papadzules y sopa de lima en un ambiente de casa '
+      'colonial con jardín. A media cuadra del convento, calle 27 entre '
+      '28 y 26.\n\n'
+      'El Toro\n'
+      'Restaurante familiar conocido por sus porciones generosas y '
+      'precios accesibles, con carnes asadas y platillos yucatecos del '
+      'día. Popular entre los habitantes locales — garantía de '
+      'autenticidad. Cerca del mercado municipal, en el centro del '
+      'pueblo.\n\n'
+      'Los Mestizos\n'
+      'Local tradicional que sirve desayunos y comidas típicas desde '
+      'temprano. Famoso por sus huevos motuleños y su sopa de lima '
+      'casera. Ambiente sencillo y trato muy amable, en los portales del '
+      'parque principal.',
 ];
 
 class PuebloDetailScreen extends StatefulWidget {
@@ -76,7 +162,7 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      _textosPlaceholder[_pestanaSeleccionada],
+                      _textosContenido[_pestanaSeleccionada],
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         height: 1.5,

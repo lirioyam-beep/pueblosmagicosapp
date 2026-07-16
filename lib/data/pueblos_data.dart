@@ -2,48 +2,63 @@ import '../models/pueblo.dart';
 import '../models/mision.dart';
 import '../models/insignia.dart';
 
-/// Misiones placeholder de Izamal.
-/// TODO: reemplazar con contenido real (ubicaciones, preguntas, textos).
+/// Misiones de Izamal con contenido real, investigado a partir del
+/// documento "Contenido cultural ruta mágica" compartido por el equipo.
 final List<Mision> misionesIzamal = [
   Mision(
     id: 'izamal_mision_1',
-    titulo: 'Visita el Convento de San Antonio',
-    descripcion: 'Descripción placeholder de la misión 1.',
+    titulo: 'Visita el Convento de San Antonio de Padua',
+    descripcion: 'Uno de los conventos coloniales más grandes del mundo, '
+        'construido en el siglo XVI sobre una pirámide maya. Su atrio es '
+        'el segundo más grande después del Vaticano.',
     lugarFisico: 'Convento de San Antonio de Padua',
     latitud: 20.9342,
     longitud: -89.0166,
     tipo: TipoMision.ubicacion,
     xpRecompensa: 50,
-    contenidoDescubrimiento: '¿Sabías que este convento fue construido en '
-        'el siglo XVI sobre una antigua pirámide maya? Contenido '
-        'placeholder — aquí irá la historia real y curiosidades del lugar.',
+    contenidoDescubrimiento: '¿Sabías que el Papa Juan Pablo II visitó '
+        'este convento en 1993 y coronó a la Virgen de Izamal? Fue la '
+        'única visita papal a Yucatán en la historia. Todas las paredes '
+        'del convento y del pueblo están pintadas de amarillo ocre, el '
+        'color que le dio a Izamal el apodo de "Ciudad Amarilla".',
   ),
   Mision(
     id: 'izamal_mision_2',
-    titulo: 'Trivia: Historia de Izamal',
-    descripcion: 'Descripción placeholder de la misión 2.',
-    lugarFisico: 'Kinich Kakmó',
+    titulo: 'Trivia: Cerro Kinich Kakmó',
+    descripcion: 'Pirámide maya dedicada al dios solar, una de las más '
+        'grandes de Yucatán por su volumen. Desde su cima se ve todo el '
+        'pueblo pintado de amarillo.',
+    lugarFisico: 'Cerro Kinich Kakmó',
     latitud: 20.9366,
     longitud: -89.0154,
     tipo: TipoMision.trivia,
     xpRecompensa: 30,
-    preguntaTrivia: '¿Pregunta placeholder?',
-    respuestaTrivia: 'Respuesta placeholder',
-    contenidoDescubrimiento: 'Existe una leyenda sobre Kinich Kakmó, el '
-        'dios sol maya... Contenido placeholder — aquí irá la leyenda real.',
+    preguntaTrivia: '¿A qué dios maya estaba dedicada la pirámide '
+        'Kinich Kakmó?',
+    respuestaTrivia: 'Al dios solar Kinich Kakmó',
+    contenidoDescubrimiento: 'Su nombre en maya significa "el que absorbe '
+        'el sol con fuego de guacamaya". Los mayas creían que el dios '
+        'Kinich Kakmó descendía en forma de guacamaya de fuego al '
+        'mediodía para consumir las ofrendas dejadas en la cima. Es una '
+        'de las pocas pirámides de Yucatán que se puede subir libremente '
+        'y de forma gratuita.',
   ),
   Mision(
     id: 'izamal_mision_3',
-    titulo: 'Prueba la comida típica',
-    descripcion: 'Descripción placeholder de la misión 3.',
-    lugarFisico: 'Mercado de Izamal',
+    titulo: 'Prueba la comida típica en el Mercado',
+    descripcion: 'El corazón social de Izamal: aquí conviven comida '
+        'tradicional yucateca, artesanías y hierberos que mantienen '
+        'vivas las costumbres del pueblo.',
+    lugarFisico: 'Mercado Municipal de Izamal',
     latitud: 20.9351,
     longitud: -89.0171,
     tipo: TipoMision.gastronomica,
     xpRecompensa: 40,
-    contenidoDescubrimiento: 'El mercado de Izamal reúne la gastronomía '
-        'tradicional yucateca desde hace generaciones. Contenido '
-        'placeholder — aquí irán datos curiosos reales del lugar.',
+    contenidoDescubrimiento: '¿Sabías que aquí se vende henequén '
+        'artesanal, la fibra que fue la base económica de Yucatán y se '
+        'conocía como "el oro verde"? Prueba también los tamales de '
+        'chipilín, envueltos en hoja de plátano — una especialidad casi '
+        'exclusiva de Izamal.',
   ),
 ];
 
