@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'login_screen.dart';
 import 'map_screen.dart';
 
 // Colores generales de la app — ver DESIGN.md
@@ -91,7 +92,9 @@ class SplashScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                ),
                 child: Text(
                   'Iniciar sesión',
                   style: GoogleFonts.inter(

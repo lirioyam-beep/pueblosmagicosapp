@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'data/pueblos_data.dart';
@@ -19,6 +20,12 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp();
+  } catch (_) {
+    // Si Firebase no está configurado todavía, AuthService lo detecta
+    // (firebaseListo) y la app sigue funcionando sin login real.
+  }
   await NotificationService.instance.inicializar(
     onTocarNotificacion: _abrirDescubrimiento,
   );

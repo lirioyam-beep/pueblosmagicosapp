@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "742079089244",
+    "project_id": "ruta-magica",
+    "storage_bucket": "ruta-magica.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742079089244:android:448186b9ac9053c0f13499",
+        "android_client_info": {
+          "package_name": "com.example.pueblosmagicosapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "742079089244-7mq85vm5r0ekf715pb5je97r1tkf3r8v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pueblosmagicosapp",
+            "certificate_hash": "2e0b26d941ddbfe627114033f6bb3bb3911b3f22"
+          }
+        },
+        {
+          "client_id": "742079089244-2t9scg7ndgoquen32sg3uqhp111r3c0l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSGPmrb1CmqhOQLNKZWnlozp06eanDTC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "742079089244-2t9scg7ndgoquen32sg3uqhp111r3c0l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
