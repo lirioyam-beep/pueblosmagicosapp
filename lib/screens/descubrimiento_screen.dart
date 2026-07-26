@@ -14,6 +14,7 @@ const Color _colorTextoPrincipal = Color(0xFF3A2A1E);
 const Color _colorTextoSecundario = Color(0xFF7A6353);
 const Color _colorDoradoXP = Color(0xFFD9A441);
 const Color _colorVerdeCompletado = Color(0xFF3F6F52);
+const Color _colorIconoBloqueado = Color(0xFFA89A85);
 
 /// Tarjeta de descubrimiento que se abre al llegar fisicamente a un lugar
 /// o al tocarlo manualmente desde el modo simulado.
@@ -158,9 +159,12 @@ class _DescubrimientoScreenState extends State<DescubrimientoScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => RetosScreen(pueblo: pueblo)),
-                ),
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => RetosScreen(pueblo: pueblo)),
+                  );
+                  if (mounted) setState(() {});
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _colorPueblo,
                   foregroundColor: Colors.white,
@@ -186,6 +190,7 @@ class _DescubrimientoScreenState extends State<DescubrimientoScreen> {
 
   Widget _buildSugerencia(BuildContext context) {
     final siguiente = _siguienteMision;
+    final retoCompletado = mision.completada;
 
     if (siguiente == null) {
       return Container(
@@ -239,9 +244,12 @@ class _DescubrimientoScreenState extends State<DescubrimientoScreen> {
               Container(
                 width: 42,
                 height: 42,
-                decoration: BoxDecoration(color: _colorPueblo, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: retoCompletado ? _colorPueblo : _colorIconoBloqueado,
+                  shape: BoxShape.circle,
+                ),
                 child: Icon(
-                  iconoPorTipoMision(siguiente.tipo),
+                  retoCompletado ? iconoPorTipoMision(siguiente.tipo) : Icons.lock,
                   color: Colors.white,
                   size: 20,
                 ),
@@ -252,16 +260,20 @@ class _DescubrimientoScreenState extends State<DescubrimientoScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      siguiente.lugarFisico,
+                      retoCompletado ? siguiente.lugarFisico : 'Bloqueado',
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: _colorTextoPrincipal,
+                        color: retoCompletado
+                            ? _colorTextoPrincipal
+                            : _colorTextoSecundario,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Ve al mapa para encontrar este punto y desbloquear su historia.',
+                      retoCompletado
+                          ? 'Ve al mapa para encontrar este punto y desbloquear su historia.'
+                          : 'Completa "Hacer el reto" para desbloquear el siguiente descubrimiento.',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: _colorTextoSecundario,
@@ -277,22 +289,25 @@ class _DescubrimientoScreenState extends State<DescubrimientoScreen> {
             width: double.infinity,
             height: 42,
             child: OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PuebloMapaScreen(
-                    pueblo: pueblo,
-                    misionResaltadaId: siguiente.id,
-                  ),
-                ),
-              ),
-              icon: const Icon(Icons.map_outlined, size: 18),
+              onPressed: !retoCompletado
+                  ? null
+                  : () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PuebloMapaScreen(
+                            pueblo: pueblo,
+                            misionResaltadaId: siguiente.id,
+                          ),
+                        ),
+                      ),
+              icon: Icon(retoCompletado ? Icons.map_outlined : Icons.lock_outline, size: 18),
               label: Text(
                 'Ver en mapa',
                 style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: _colorPueblo,
-                side: BorderSide(color: _colorPueblo),
+                disabledForegroundColor: _colorIconoBloqueado,
+                side: BorderSide(color: retoCompletado ? _colorPueblo : _colorIconoBloqueado),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(21)),
               ),
             ),

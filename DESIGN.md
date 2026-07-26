@@ -1,4 +1,4 @@
-# Ruta Mágica — Diseño Visual
+# Xíimbal Yucatán — Diseño Visual
 
 ## Paleta general de la app
 Estos colores están presentes en TODAS las pantallas sin importar el pueblo activo.
@@ -62,12 +62,14 @@ Usar de forma consistente en TODA la app: mapa, retos, insignias, pueblos.
 - Sin imágenes reales por ahora — usar bloques de color como placeholder
 - Íconos: Material Icons o paquete Iconsax para Flutter
 
-## Mapa de exploración (pantalla 2)
-- Estilo videojuego, NO lista de tarjetas
-- Camino punteado curvo conectando los 3 nodos de pueblos
-- Cada nodo es un círculo con el estado visual correspondiente
-- Nodo activo (Izamal): terracota con animación de pulso
-- Nodo completado: verde con check
-- Nodo bloqueado: gris con candado
+## Selector de pueblos (pantalla 2)
+- Lista de tarjetas tipo menú, una por pueblo (mismo lenguaje visual que
+  "Tu ruta" en la pantalla de perfil)
+- Cada tarjeta: círculo de estado + nombre del pueblo + estado/progreso +
+  flecha, todo respetando el color principal del pueblo activo
+- Tocar una tarjeta activa o completada lleva directo al mapa real
+  (pueblo_mapa_screen) — ya no hay paso intermedio de "conocer"
+- Tocar una tarjeta bloqueada (Valladolid, Maní) muestra un mensaje de
+  que llegará en una futura actualización — el bloqueo NO depende de
+  completar otro pueblo primero
 - Barra de progreso delgada arriba mostrando pueblos completados
-- Botón principal abajo: "Continuar a [pueblo activo]"

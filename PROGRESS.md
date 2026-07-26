@@ -1,4 +1,4 @@
-# Ruta Mágica — Progreso del proyecto
+# Xíimbal Yucatán — Progreso del proyecto
 
 ## Estado actual
 Última actualización: 16 de julio 2026

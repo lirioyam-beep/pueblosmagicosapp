@@ -1,9 +1,9 @@
-# Ruta Mágica — Funcionalidades y Casos de Uso
+# Xíimbal Yucatán — Funcionalidades y Casos de Uso
 
 ## Pantallas definidas
 
 ### 1. splash_screen.dart — Bienvenida
-- Nombre de la app "Ruta Mágica" con tipografía Poppins grande
+- Nombre de la app "Xíimbal Yucatán" con tipografía Poppins grande
 - Ilustración o bloque de color representativo de Yucatán
 - Botón principal: "Explorar pueblos"
 - Botón secundario pequeño: "Iniciar sesión" (placeholder, sin funcionalidad real aún)

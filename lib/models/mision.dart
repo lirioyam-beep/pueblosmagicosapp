@@ -14,6 +14,7 @@ class Mision {
   bool completada;
   String? preguntaTrivia; // solo para tipo trivia
   String? respuestaTrivia;
+  List<String>? opcionesTrivia; // opciones de respuesta, incluye la correcta
 
   /// Dato curioso, leyenda o contexto cultural del lugar. Se muestra en la
   /// tarjeta de descubrimiento cuando el usuario llega físicamente (antes
@@ -34,6 +35,7 @@ class Mision {
     this.completada = false,
     this.preguntaTrivia,
     this.respuestaTrivia,
+    this.opcionesTrivia,
     this.contenidoDescubrimiento = '',
   });
 }

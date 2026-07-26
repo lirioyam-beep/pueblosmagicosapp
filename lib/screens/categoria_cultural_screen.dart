@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/pueblo.dart';
 import '../utils/color_utils.dart';
+import '../utils/contenido_cultural_utils.dart';
+import '../widgets/barra_navegacion_inferior.dart';
 import '../widgets/insignia_badge.dart';
 import 'pueblo_mapa_screen.dart';
 
@@ -11,14 +13,6 @@ const Color _colorBordeSuave = Color(0xFFEFE2C8);
 const Color _colorTextoPrincipal = Color(0xFF3A2A1E);
 const Color _colorTextoSecundario = Color(0xFF7A6353);
 const Color _colorVerdeCompletado = Color(0xFF3F6F52);
-const Color _colorTerracotaActivo = Color(0xFFC1502E);
-
-const List<String> _nombresPestanas = [
-  'Historia',
-  'Leyendas',
-  'Cultura',
-  'Recomendaciones',
-];
 
 // Contenido real de Izamal — investigado y redactado a partir del
 // documento "Contenido cultural ruta mágica" compartido por el equipo.
@@ -118,62 +112,57 @@ const List<String> _textosContenido = [
       'Local tradicional que sirve desayunos y comidas típicas desde '
       'temprano. Famoso por sus huevos motuleños y su sopa de lima '
       'casera. Ambiente sencillo y trato muy amable, en los portales del '
-      'parque principal.',
+      'parque principal.\n\n'
+      'La Conquista\n'
+      'A pocas cuadras del centro, especializado en poc chuc y chiles '
+      'xcatic rellenos. Buena opción de precios razonables para probar '
+      'sabores tradicionales sin salir del primer cuadro del pueblo.\n\n'
+      'Zamná\n'
+      'Ambiente acogedor y cocina yucateca con ingredientes frescos — '
+      'sus empanadas de queso de bola y su sopa de lima tienen fama '
+      'entre quienes visitan Izamal por primera vez.',
 ];
 
-class PuebloDetailScreen extends StatefulWidget {
+/// Pantalla dedicada a UNA sola categoría (Historia, Leyendas, Cultura o
+/// Recomendaciones) — sin selector de pestañas: cada categoría vive en su
+/// propia pantalla, separada y completa. Se llega aquí desde una tarjeta
+/// de menu_cultural_screen.dart.
+class CategoriaCulturalScreen extends StatelessWidget {
   final Pueblo pueblo;
+  final int categoriaIndice;
 
-  const PuebloDetailScreen({super.key, required this.pueblo});
+  const CategoriaCulturalScreen({
+    super.key,
+    required this.pueblo,
+    required this.categoriaIndice,
+  });
 
-  @override
-  State<PuebloDetailScreen> createState() => _PuebloDetailScreenState();
-}
-
-class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
-  int _pestanaSeleccionada = 0;
-
-  Color get _colorPueblo => colorDesdeHex(widget.pueblo.colorHex);
-  int get _lugaresDescubiertos => widget.pueblo.misiones
-      .where((mision) => mision.descubierta || mision.completada)
-      .length;
-
-  bool _misionDescubierta(String id) {
-    return widget.pueblo.misiones.any(
-      (mision) => mision.id == id && (mision.descubierta || mision.completada),
-    );
-  }
-
-  bool _pestanaDesbloqueada(int indice) {
-    switch (indice) {
-      case 0:
-        return _lugaresDescubiertos > 0;
-      case 1:
-        return _misionDescubierta('izamal_mision_2');
-      case 2:
-        return _lugaresDescubiertos > 0;
-      case 3:
-        return _misionDescubierta('izamal_mision_3');
-      default:
-        return false;
-    }
-  }
+  Color get _colorPueblo => colorDesdeHex(pueblo.colorHex);
 
   String _mensajeBloqueado(int indice) {
     switch (indice) {
       case 1:
-        return 'Leyendas bloqueadas. Descubre el Cerro Kinich Kakmo para revelar esta parte de Izamal.';
+        return 'Leyendas bloqueadas. Descubre el Cerro Kinich Kakmó para revelar esta parte de Izamal.';
       case 3:
-        return 'Recomendaciones bloqueadas. Explora el mercado y la zona gastronomica para desbloquearlas.';
+        return 'Recomendaciones bloqueadas. Explora el mercado y la zona gastronómica para desbloquearlas.';
       default:
-        return 'Contenido bloqueado. Explora al menos un punto del pueblo para revelar esta seccion.';
+        return 'Contenido bloqueado. Explora al menos un punto del pueblo para revelar esta sección.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final desbloqueada = pestanaCulturalDesbloqueada(pueblo, categoriaIndice);
+    final total = pueblo.misiones.length;
+    final descubiertos = lugaresDescubiertos(pueblo);
+    final progreso = total == 0 ? 0.0 : descubiertos / total;
+
     return Scaffold(
       backgroundColor: _colorFondoCrema,
+      bottomNavigationBar: BarraNavegacionInferior(
+        seccionActual: SeccionNav.cultura,
+        pueblo: pueblo,
+      ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -190,15 +179,21 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildBanner(),
+                  _buildEncabezado(),
                   const SizedBox(height: 20),
-                  _buildResumenDescubrimiento(),
-                  const SizedBox(height: 20),
-                  _buildSegmentedControl(),
-                  const SizedBox(height: 20),
-                  _buildContenidoPestana(),
-                  const SizedBox(height: 28),
-                  _buildSeccionInsignias(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildResumenDescubrimiento(total, descubiertos, progreso),
+                        const SizedBox(height: 20),
+                        _buildContenido(desbloqueada),
+                        const SizedBox(height: 28),
+                        _buildSeccionInsignias(),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 12),
                 ],
               ),
@@ -210,213 +205,151 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
     );
   }
 
-  Widget _buildBanner() {
+  Widget _buildEncabezado() {
     return Container(
       width: double.infinity,
-      height: 200,
+      padding: const EdgeInsets.symmetric(vertical: 32),
       color: _colorPueblo,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: _colorVerdeCompletado,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'Pueblo Mágico',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: _colorVerdeCompletado,
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(height: 12),
-            Text(
-              widget.pueblo.nombre,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 30,
+            child: Text(
+              pueblo.nombre,
+              style: GoogleFonts.inter(
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          Icon(iconosPestanasCultural[categoriaIndice], color: Colors.white, size: 40),
+          const SizedBox(height: 10),
+          Text(
+            nombresPestanasCultural[categoriaIndice],
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSegmentedControl() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: List.generate(_nombresPestanas.length, (i) {
-          final activa = i == _pestanaSeleccionada;
-          return Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              onTap: () => setState(() => _pestanaSeleccionada = i),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                decoration: BoxDecoration(
-                  color: activa ? _colorTerracotaActivo : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: activa ? _colorTerracotaActivo : _colorBordeSuave,
-                  ),
-                ),
-                child: Text(
-                  _nombresPestanas[i],
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: activa ? Colors.white : _colorTextoSecundario,
-                  ),
+  Widget _buildResumenDescubrimiento(int total, int descubiertos, double progreso) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _colorBordeSuave),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Descubrimientos',
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: _colorTextoPrincipal,
                 ),
               ),
+              Text(
+                '$descubiertos/$total',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: _colorPueblo,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progreso,
+              minHeight: 8,
+              backgroundColor: _colorBordeSuave,
+              valueColor: AlwaysStoppedAnimation(_colorPueblo),
             ),
-          );
-        }),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'La información cultural se desbloquea conforme visitas puntos reales del pueblo.',
+            style: GoogleFonts.inter(fontSize: 12, color: _colorTextoSecundario),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildResumenDescubrimiento() {
-    final total = widget.pueblo.misiones.length;
-    final progreso = total == 0 ? 0.0 : _lugaresDescubiertos / total;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
+  Widget _buildContenido(bool desbloqueada) {
+    if (!desbloqueada) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: _colorBordeSuave),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Descubrimientos',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: _colorTextoPrincipal,
-                  ),
-                ),
-                Text(
-                  '$_lugaresDescubiertos/$total',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: _colorPueblo,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: progreso,
-                minHeight: 8,
-                backgroundColor: _colorBordeSuave,
-                valueColor: AlwaysStoppedAnimation(_colorPueblo),
-              ),
-            ),
+            const Icon(Icons.lock_outline, color: _colorTextoSecundario),
             const SizedBox(height: 10),
             Text(
-              'La informacion cultural se desbloquea conforme visitas puntos reales del pueblo.',
+              _mensajeBloqueado(categoriaIndice),
+              textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 12,
+                fontSize: 13,
+                height: 1.4,
                 color: _colorTextoSecundario,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildContenidoPestana() {
-    final desbloqueada = _pestanaDesbloqueada(_pestanaSeleccionada);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: desbloqueada
-            ? Text(
-                _textosContenido[_pestanaSeleccionada],
-                key: ValueKey('contenido-$_pestanaSeleccionada'),
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  height: 1.5,
-                  color: _colorTextoSecundario,
-                ),
-              )
-            : Container(
-                key: ValueKey('bloqueado-$_pestanaSeleccionada'),
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: _colorBordeSuave),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(Icons.lock_outline, color: _colorTextoSecundario),
-                    const SizedBox(height: 10),
-                    Text(
-                      _mensajeBloqueado(_pestanaSeleccionada),
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        height: 1.4,
-                        color: _colorTextoSecundario,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
+    return Text(
+      _textosContenido[categoriaIndice],
+      style: GoogleFonts.inter(fontSize: 14, height: 1.5, color: _colorTextoSecundario),
     );
   }
 
   Widget _buildSeccionInsignias() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Insignias',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: _colorTextoPrincipal,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Insignias',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: _colorTextoPrincipal,
           ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: widget.pueblo.insignias
-                .map((insignia) => InsigniaBadge(insignia: insignia))
-                .toList(),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: pueblo.insignias.map((insignia) => InsigniaBadge(insignia: insignia)).toList(),
+        ),
+      ],
     );
   }
 
@@ -429,12 +362,8 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
         child: ElevatedButton(
           onPressed: () async {
             await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => PuebloMapaScreen(pueblo: widget.pueblo),
-              ),
+              MaterialPageRoute(builder: (_) => PuebloMapaScreen(pueblo: pueblo)),
             );
-            // Refresca insignias/estado al volver de explorar/retos.
-            if (mounted) setState(() {});
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: _colorPueblo,
@@ -443,7 +372,7 @@ class _PuebloDetailScreenState extends State<PuebloDetailScreen> {
             elevation: 0,
           ),
           child: Text(
-            'Explorar ${widget.pueblo.nombre}',
+            'Explorar ${pueblo.nombre}',
             style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ),

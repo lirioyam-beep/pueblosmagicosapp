@@ -63,6 +63,12 @@ class AuthService {
     return _auth.signInWithCredential(credencial);
   }
 
+  Future<void> actualizarNombre(String nombre) async {
+    _asegurarFirebaseListo();
+    await _auth.currentUser?.updateDisplayName(nombre);
+    await _auth.currentUser?.reload();
+  }
+
   Future<void> cerrarSesion() async {
     if (!firebaseListo) return;
     await _auth.signOut();

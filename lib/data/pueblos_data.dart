@@ -35,7 +35,13 @@ final List<Mision> misionesIzamal = [
     xpRecompensa: 30,
     preguntaTrivia: '¿A qué dios maya estaba dedicada la pirámide '
         'Kinich Kakmó?',
-    respuestaTrivia: 'Al dios solar Kinich Kakmó',
+    respuestaTrivia: 'Kinich Kakmó, dios solar',
+    opcionesTrivia: const [
+      'Ix Chel, diosa de la luna',
+      'Kinich Kakmó, dios solar',
+      'Chaac, dios de la lluvia',
+      'Ah Puch, dios de la muerte',
+    ],
     contenidoDescubrimiento: 'Su nombre en maya significa "el que absorbe '
         'el sol con fuego de guacamaya". Los mayas creían que el dios '
         'Kinich Kakmó descendía en forma de guacamaya de fuego al '
@@ -59,6 +65,63 @@ final List<Mision> misionesIzamal = [
         'conocía como "el oro verde"? Prueba también los tamales de '
         'chipilín, envueltos en hoja de plátano — una especialidad casi '
         'exclusiva de Izamal.',
+  ),
+  Mision(
+    id: 'izamal_mision_4',
+    titulo: 'Descubre la Pirámide de Itzamatul',
+    descripcion: 'Otra gran pirámide maya de Izamal, a pocos minutos a '
+        'pie de la plaza principal — mucho menos visitada que Kinich '
+        'Kakmó, pero igual de importante para la historia del pueblo.',
+    lugarFisico: 'Pirámide de Itzamatul',
+    latitud: 20.9330,
+    longitud: -89.0150,
+    tipo: TipoMision.ubicacion,
+    xpRecompensa: 50,
+    contenidoDescubrimiento: '¿Sabías que Itzamatul está dedicada a '
+        'Zamná, el fundador mítico de Izamal según la tradición maya? '
+        'A diferencia de Kinich Kakmó, esta pirámide recibe muchos menos '
+        'visitantes — un buen lugar para sentir la historia del pueblo '
+        'con calma.',
+  ),
+  Mision(
+    id: 'izamal_mision_5',
+    titulo: 'Trivia: Museo de Artesanías',
+    descripcion: 'Pequeño museo cultural dentro de una mansión colonial '
+        'del siglo XVI, con salas dedicadas a las artesanías tradicionales '
+        'de la región.',
+    lugarFisico: 'Museo de Artesanías de Izamal',
+    latitud: 20.9345,
+    longitud: -89.0160,
+    tipo: TipoMision.trivia,
+    xpRecompensa: 30,
+    preguntaTrivia: '¿Cuál de estos NO es un material exhibido en el '
+        'Museo de Artesanías de Izamal?',
+    respuestaTrivia: 'Vidrio soplado',
+    opcionesTrivia: const [
+      'Henequén y fibras vegetales',
+      'Vidrio soplado',
+      'Madera',
+      'Textiles',
+    ],
+    contenidoDescubrimiento: 'El museo tiene 11 salas divididas en cinco '
+        'categorías: madera, cerámica, metal, textiles y fibras '
+        'vegetales como el henequén — la misma fibra que se vende en el '
+        'mercado municipal.',
+  ),
+  Mision(
+    id: 'izamal_mision_6',
+    titulo: 'Visita la Capilla de los Remedios',
+    descripcion: 'La segunda construcción colonial más grande de Izamal, '
+        'dentro del tranquilo Parque de los Remedios.',
+    lugarFisico: 'Capilla de los Remedios',
+    latitud: 20.9355,
+    longitud: -89.0180,
+    tipo: TipoMision.ubicacion,
+    xpRecompensa: 40,
+    contenidoDescubrimiento: 'Aunque el Convento de San Antonio de Padua '
+        'se lleva toda la fama, esta capilla es la segunda edificación '
+        'colonial más grande del pueblo — vale la pena conocerla sin las '
+        'multitudes del centro.',
   ),
 ];
 

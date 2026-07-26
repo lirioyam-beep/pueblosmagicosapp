@@ -1,4 +1,4 @@
-# Ruta Mágica — Base de Datos
+# Xíimbal Yucatán — Base de Datos
 
 ## Tecnología
 Firebase (Google) — fase futura del proyecto.

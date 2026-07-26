@@ -9,6 +9,24 @@ const Color _colorFondoCrema = Color(0xFFFBF3E6);
 const Color _colorTextoPrincipal = Color(0xFF3A2A1E);
 const Color _colorTextoSecundario = Color(0xFF7A6353);
 const Color _colorDoradoXP = Color(0xFFD9A441);
+const Color _colorVerdeCompletado = Color(0xFF3F6F52);
+const Color _colorRojoError = Color(0xFFB3423A);
+
+/// Reglas mínimas de contraseña — ver checklist en la pantalla de registro.
+final RegExp _reMayuscula = RegExp(r'[A-Z]');
+final RegExp _reMinuscula = RegExp(r'[a-z]');
+final RegExp _reNumero = RegExp(r'[0-9]');
+final RegExp _reSimbolo = RegExp(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\];/\\~`]');
+
+String? _validarContrasena(String? v) {
+  if (v == null || v.isEmpty) return 'Ingresa una contraseña';
+  if (v.length < 6) return 'Mínimo 6 caracteres';
+  if (!_reMayuscula.hasMatch(v)) return 'Falta una letra mayúscula';
+  if (!_reMinuscula.hasMatch(v)) return 'Falta una letra minúscula';
+  if (!_reNumero.hasMatch(v)) return 'Falta un número';
+  if (!_reSimbolo.hasMatch(v)) return 'Falta un símbolo (ej. !@#\$%)';
+  return null;
+}
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -109,12 +127,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _contrasenaController,
                 etiqueta: 'Contraseña',
                 esPassword: true,
-                validador: (v) {
-                  if (v == null || v.isEmpty) return 'Ingresa una contraseña';
-                  if (v.length < 6) return 'Mínimo 6 caracteres';
-                  return null;
-                },
+                validador: _validarContrasena,
+                onChanged: (_) => setState(() {}),
               ),
+              const SizedBox(height: 12),
+              _ChecklistContrasena(contrasena: _contrasenaController.text),
               const SizedBox(height: 16),
               CampoTextoAuth(
                 controller: _confirmarController,
@@ -126,7 +143,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
                   return null;
                 },
+                onChanged: (_) => setState(() {}),
               ),
+              if (_confirmarController.text.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _IndicadorCoincidencia(
+                  coinciden: _confirmarController.text == _contrasenaController.text,
+                ),
+              ],
               const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
@@ -178,6 +202,82 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Lista de requisitos de la contraseña — cada uno se marca en verde
+/// conforme se va cumpliendo mientras el usuario escribe.
+class _ChecklistContrasena extends StatelessWidget {
+  final String contrasena;
+
+  const _ChecklistContrasena({required this.contrasena});
+
+  @override
+  Widget build(BuildContext context) {
+    final requisitos = [
+      ('Mínimo 6 caracteres', contrasena.length >= 6),
+      ('Una letra mayúscula', _reMayuscula.hasMatch(contrasena)),
+      ('Una letra minúscula', _reMinuscula.hasMatch(contrasena)),
+      ('Un número', _reNumero.hasMatch(contrasena)),
+      ('Un símbolo (ej. ! @ # \$)', _reSimbolo.hasMatch(contrasena)),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (texto, cumplido) in requisitos)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                Icon(
+                  cumplido ? Icons.check_circle : Icons.radio_button_unchecked,
+                  size: 16,
+                  color: cumplido ? _colorVerdeCompletado : _colorTextoSecundario,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  texto,
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    color: cumplido ? _colorVerdeCompletado : _colorTextoSecundario,
+                    fontWeight: cumplido ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Indica si "Confirmar contraseña" coincide con la contraseña escrita.
+class _IndicadorCoincidencia extends StatelessWidget {
+  final bool coinciden;
+
+  const _IndicadorCoincidencia({required this.coinciden});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          coinciden ? Icons.check_circle : Icons.error_outline,
+          size: 16,
+          color: coinciden ? _colorVerdeCompletado : _colorRojoError,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          coinciden ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden',
+          style: GoogleFonts.inter(
+            fontSize: 12.5,
+            color: coinciden ? _colorVerdeCompletado : _colorRojoError,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

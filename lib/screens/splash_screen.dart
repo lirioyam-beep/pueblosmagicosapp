@@ -54,7 +54,7 @@ class SplashScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                'Ruta Mágica',
+                'Xíimbal Yucatán',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 32,

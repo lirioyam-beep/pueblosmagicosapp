@@ -6,8 +6,10 @@ import '../models/pueblo.dart';
 import '../services/auth_service.dart';
 import '../utils/color_utils.dart';
 import '../utils/progreso_utils.dart';
+import '../widgets/barra_navegacion_inferior.dart';
 import '../widgets/insignia_badge.dart';
 import 'login_screen.dart';
+import 'niveles_screen.dart';
 
 // Paleta general de la app — ver DESIGN.md
 const Color _colorFondoCrema = Color(0xFFFBF3E6);
@@ -17,12 +19,6 @@ const Color _colorTextoSecundario = Color(0xFF7A6353);
 const Color _colorDoradoXP = Color(0xFFD9A441);
 const Color _colorVerdeCompletado = Color(0xFF3F6F52);
 const Color _colorIconoBloqueado = Color(0xFFA89A85);
-
-const List<String> _rutasAvatar = [
-  'assets/avatares/avatar_1v.png',
-  'assets/avatares/avatar_2v.png',
-  'assets/avatares/avatar_3v.png',
-];
 
 // XP necesaria por nivel — placeholder simple, sin backend todavía.
 const int _xpPorNivel = 100;
@@ -35,7 +31,75 @@ class InsigniasScreen extends StatefulWidget {
 }
 
 class _InsigniasScreenState extends State<InsigniasScreen> {
-  int _avatarSeleccionado = 0;
+  // Foto de perfil placeholder: un círculo de color liso por cada pueblo,
+  // mientras el equipo de diseño entrega arte real. No se persiste todavía.
+  int _puebloFotoSeleccionada = 0;
+
+  Future<void> _elegirFotoPerfil() async {
+    final indiceElegido = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Elige tu foto de perfil',
+              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Un color por cada pueblo, mientras llega el arte definitivo.',
+              style: GoogleFonts.inter(fontSize: 12, color: _colorTextoSecundario),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(pueblosData.length, (i) {
+                final pueblo = pueblosData[i];
+                final color = colorDesdeHex(pueblo.colorHex);
+                return GestureDetector(
+                  onTap: () => Navigator.of(context).pop(i),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: i == _puebloFotoSeleccionada
+                                ? _colorTextoPrincipal
+                                : Colors.transparent,
+                            width: 3,
+                          ),
+                        ),
+                        child: const Icon(Icons.person, color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        pueblo.nombre,
+                        style: GoogleFonts.inter(fontSize: 12, color: _colorTextoPrincipal),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (indiceElegido != null) {
+      setState(() => _puebloFotoSeleccionada = indiceElegido);
+    }
+  }
 
   Future<void> _irALogin() async {
     await Navigator.of(context).push(
@@ -46,6 +110,34 @@ class _InsigniasScreenState extends State<InsigniasScreen> {
 
   Future<void> _cerrarSesion() async {
     await AuthService.instance.cerrarSesion();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _editarNombre(String nombreActual) async {
+    final controller = TextEditingController(text: nombreActual);
+    final nuevoNombre = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Editar nombre', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Tu nombre'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(controller.text.trim()),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+    if (nuevoNombre == null || nuevoNombre.isEmpty) return;
+    await AuthService.instance.actualizarNombre(nuevoNombre);
     if (mounted) setState(() {});
   }
 
@@ -62,6 +154,9 @@ class _InsigniasScreenState extends State<InsigniasScreen> {
 
     return Scaffold(
       backgroundColor: _colorFondoCrema,
+      bottomNavigationBar: const BarraNavegacionInferior(
+        seccionActual: SeccionNav.perfil,
+      ),
       appBar: AppBar(
         backgroundColor: _colorFondoCrema,
         elevation: 0,
@@ -72,41 +167,56 @@ class _InsigniasScreenState extends State<InsigniasScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_rutasAvatar.length, (i) {
-                final seleccionado = i == _avatarSeleccionado;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: GestureDetector(
-                    onTap: () => setState(() => _avatarSeleccionado = i),
+            GestureDetector(
+              onTap: _elegirFotoPerfil,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 76,
+                    height: 76,
+                    decoration: BoxDecoration(
+                      color: colorDesdeHex(pueblosData[_puebloFotoSeleccionada].colorHex),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.person, color: Colors.white, size: 36),
+                  ),
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
                     child: Container(
-                      width: 64,
-                      height: 64,
-                      padding: const EdgeInsets.all(3),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
+                        color: Colors.white,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: seleccionado ? _colorDoradoXP : Colors.transparent,
-                          width: 3,
-                        ),
+                        border: Border.all(color: _colorBordeSuave),
                       ),
-                      child: ClipOval(
-                        child: Image.asset(_rutasAvatar[i], fit: BoxFit.cover),
-                      ),
+                      child: const Icon(Icons.edit, size: 14, color: _colorTextoSecundario),
                     ),
                   ),
-                );
-              }),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            Text(
-              nombreMostrado,
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: _colorTextoPrincipal,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  nombreMostrado,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: _colorTextoPrincipal,
+                  ),
+                ),
+                if (sesionIniciada) ...[
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () => _editarNombre(nombreMostrado),
+                    child: const Icon(Icons.edit_outlined, size: 18, color: _colorTextoSecundario),
+                  ),
+                ],
+              ],
             ),
             if (sesionIniciada && usuario.email != null) ...[
               const SizedBox(height: 2),
@@ -125,6 +235,19 @@ class _InsigniasScreenState extends State<InsigniasScreen> {
                   fontWeight: FontWeight.w600,
                   color: _colorDoradoXP,
                 ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NivelesScreen()),
+              ),
+              icon: const Icon(Icons.military_tech_outlined, size: 18),
+              label: const Text('Ver niveles'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _colorTextoPrincipal,
+                side: const BorderSide(color: _colorBordeSuave),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
             ),
             const SizedBox(height: 12),

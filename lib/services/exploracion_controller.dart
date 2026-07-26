@@ -29,7 +29,9 @@ class ExploracionController {
     _puebloActivo = pueblo;
     _misionesNotificadas.clear();
     _suscripcion?.cancel();
-    _suscripcion = _locationService.posicionEnVivo().listen(_alRecibirPosicion);
+    _suscripcion = _locationService
+        .posicionEnVivo()
+        .listen(_alRecibirPosicion, onError: (_) {});
   }
 
   /// Detiene el monitoreo. Se llama al volver al selector de pueblos.

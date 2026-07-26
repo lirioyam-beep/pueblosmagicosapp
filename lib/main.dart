@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Ruta Mágica',
+      title: 'Xíimbal Yucatán',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

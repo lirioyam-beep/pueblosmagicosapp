@@ -9,7 +9,9 @@ import '../services/exploracion_controller.dart';
 import '../services/location_service.dart';
 import '../utils/color_utils.dart';
 import '../utils/insignia_utils.dart';
+import '../widgets/barra_navegacion_inferior.dart';
 import '../widgets/mision_card.dart';
+import 'completar_reto_screen.dart';
 import 'descubrimiento_screen.dart';
 import 'pueblo_mapa_screen.dart';
 
@@ -66,9 +68,12 @@ class _RetosScreenState extends State<RetosScreen> {
     });
 
     if (estado == EstadoUbicacion.disponible) {
-      _suscripcionPosicion = _locationService.posicionEnVivo().listen((posicion) {
-        if (mounted) setState(() => _posicionActual = posicion);
-      });
+      _suscripcionPosicion = _locationService.posicionEnVivo().listen(
+        (posicion) {
+          if (mounted) setState(() => _posicionActual = posicion);
+        },
+        onError: (_) {},
+      );
     }
   }
 
@@ -84,7 +89,13 @@ class _RetosScreenState extends State<RetosScreen> {
     return _locationService.distanciaAMision(_posicionActual!, mision);
   }
 
-  void _completarMision(Mision mision) {
+  Future<void> _completarMision(Mision mision) async {
+    final completado = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => CompletarRetoScreen(mision: mision, colorPueblo: _colorPueblo),
+      ),
+    );
+    if (completado != true) return;
     setState(() {
       mision.descubierta = true;
       mision.completada = true;
@@ -115,6 +126,10 @@ class _RetosScreenState extends State<RetosScreen> {
 
     return Scaffold(
       backgroundColor: _colorFondoCrema,
+      bottomNavigationBar: BarraNavegacionInferior(
+        seccionActual: SeccionNav.misiones,
+        pueblo: widget.pueblo,
+      ),
       appBar: AppBar(
         backgroundColor: _colorFondoCrema,
         elevation: 0,

@@ -11,8 +11,9 @@ import '../services/exploracion_controller.dart';
 import '../services/location_service.dart';
 import '../utils/color_utils.dart';
 import '../utils/mision_utils.dart';
+import '../widgets/barra_navegacion_inferior.dart';
 import 'descubrimiento_screen.dart';
-import 'retos_screen.dart';
+import 'map_screen.dart';
 
 // Paleta general de la app — ver DESIGN.md
 const Color _colorFondoCrema = Color(0xFFFBF3E6);
@@ -103,9 +104,12 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
     });
 
     if (estado == EstadoUbicacion.disponible) {
-      _suscripcionPosicion = _locationService.posicionEnVivo().listen((posicion) {
-        if (mounted) setState(() => _posicionActual = posicion);
-      });
+      _suscripcionPosicion = _locationService.posicionEnVivo().listen(
+        (posicion) {
+          if (mounted) setState(() => _posicionActual = posicion);
+        },
+        onError: (_) {},
+      );
     }
   }
 
@@ -202,10 +206,23 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
 
     return Scaffold(
       backgroundColor: _colorFondoCrema,
+      bottomNavigationBar: BarraNavegacionInferior(
+        seccionActual: SeccionNav.mapa,
+        pueblo: widget.pueblo,
+      ),
       appBar: AppBar(
         backgroundColor: _colorFondoCrema,
         elevation: 0,
+        automaticallyImplyLeading: false,
         iconTheme: IconThemeData(color: _colorPueblo),
+        leading: IconButton(
+          icon: const Icon(Icons.logout),
+          tooltip: 'Salir del pueblo',
+          onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const MapScreen()),
+            (route) => false,
+          ),
+        ),
         title: Text(
           widget.pueblo.nombre,
           style: GoogleFonts.poppins(
@@ -215,19 +232,6 @@ class _PuebloMapaScreenState extends State<PuebloMapaScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.list_alt_outlined),
-            tooltip: 'Ver lista de retos',
-            onPressed: () async {
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => RetosScreen(pueblo: widget.pueblo),
-                ),
-              );
-              // Refresca marcadores/XP al volver de la lista de retos.
-              if (mounted) setState(() {});
-            },
-          ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

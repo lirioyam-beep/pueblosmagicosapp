@@ -1,4 +1,4 @@
-# Ruta Mágica — App Gamificada Pueblos Mágicos de Yucatán
+# Xíimbal Yucatán — App Gamificada Pueblos Mágicos de Yucatán
 
 ## Descripción general
 App móvil gamificada de turismo cultural para los Pueblos Mágicos de Yucatán. 
@@ -8,7 +8,7 @@ ubicación real. No fuerza al usuario a ir a un lugar — le recomienda y le
 cuenta cosas de lo que tiene cerca mientras camina por el pueblo.
 
 ## Nombre
-**Ruta Mágica**
+**Xíimbal Yucatán**
 
 ## Tecnología
 - Flutter + Dart (desarrollo móvil)

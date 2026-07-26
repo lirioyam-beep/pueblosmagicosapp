@@ -12,6 +12,13 @@ enum EstadoUbicacion {
 /// y cálculo de distancia contra los puntos de misiones. Ver DATABASE.md
 /// (Mision.latitud/longitud/radioMetros) y FEATURES.md (radio de 100m).
 class LocationService {
+  // Varias pantallas y ExploracionController escuchan la posición en vivo
+  // al mismo tiempo. Geolocator.getPositionStream() abre un canal nativo
+  // nuevo cada vez que se llama — si se invoca varias veces en paralelo,
+  // en algunos dispositivos el canal nativo se pisa entre sí y truena la
+  // app. Por eso se cachea como un solo broadcast stream compartido.
+  Stream<Position>? _streamPosicion;
+
   Future<LocationPermission> _asegurarPermiso() async {
     var permiso = await Geolocator.checkPermission();
     if (permiso == LocationPermission.denied) {
@@ -49,12 +56,12 @@ class LocationService {
   /// Stream de posición en vivo (solo emite si hay permiso y servicio
   /// activo). Se actualiza conforme el usuario camina por el pueblo.
   Stream<Position> posicionEnVivo() {
-    return Geolocator.getPositionStream(
+    return _streamPosicion ??= Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 10, // metros mínimos entre actualizaciones
       ),
-    );
+    ).asBroadcastStream();
   }
 
   double distanciaAMision(Position posicionUsuario, Mision mision) {
